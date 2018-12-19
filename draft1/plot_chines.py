@@ -284,10 +284,26 @@ def make_panel_tris(panel, point_df):
                   #line_width=50.
                   #)
 
+def simplify_panel_tris(tri_coords, tri_list):
+    new_tri_list = deepcopy(tri_list)
+    unique_pts = []
 
+    for i, row in enumerate(tri_coords):
+        _row = tuple(row)
+        if _row not in unique_pts:
+            unique_pts.append(_row)
+        else:
+            prev_row = unique_pts.index(_row)
+            new_tri_list[new_tri_list == i] = prev_row
+            #new_tri_list[new_tri_list > i] -= 1
+
+    return np.array(unique_pts), new_tri_list
 
 for p in panels.values():
     p_tri_coords, p_tri_list = make_panel_tris(p, offsets)
+
+    p_tri_coords, p_tri_list = simplify_panel_tris(p_tri_coords, p_tri_list)
+
     mlab.triangular_mesh(p_tri_coords[:,0],
                          p_tri_coords[:,1],
                          p_tri_coords[:,2],
@@ -303,4 +319,3 @@ for p in panels.values():
 #                 line_width=50.
 #                 )
 mlab.show()
-
